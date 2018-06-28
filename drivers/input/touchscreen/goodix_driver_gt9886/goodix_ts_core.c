@@ -839,6 +839,9 @@ static irqreturn_t goodix_ts_threadirq_func(int irq, void *data)
 		return IRQ_HANDLED;
 	}
 
+	/* prevent CPU from entering deep sleep */
+	pm_qos_update_request(&core_data->pm_qos_req, 100);
+
 	mutex_lock(&goodix_modules.mutex);
 	list_for_each_entry(ext_module, &goodix_modules.head, list) {
 		if (!ext_module->funcs->irq_event)
@@ -850,6 +853,8 @@ static irqreturn_t goodix_ts_threadirq_func(int irq, void *data)
 		}
 	}
 	mutex_unlock(&goodix_modules.mutex);
+
+	pm_qos_update_request(&core_data->pm_qos_req, PM_QOS_DEFAULT_VALUE);
 
 	/* read touch data from touch device */
 	r = ts_dev->hw_ops->event_handler(ts_dev, ts_event);
@@ -2263,6 +2268,10 @@ static int goodix_ts_probe(struct platform_device *pdev)
 		ts_err("ERROR:register bl_notifier failed\n");
 		goto out;
 	}
+
+	pm_qos_add_request(&core_data->pm_qos_req, PM_QOS_CPU_DMA_LATENCY,
+		PM_QOS_DEFAULT_VALUE);
+
 	core_data->attrs.attrs = goodix_attr_group;
 	r = sysfs_create_group(&client->dev.kobj, &core_data->attrs);
 	if (r) {
@@ -2314,6 +2323,9 @@ static int goodix_ts_remove(struct platform_device *pdev)
 {
 	struct goodix_ts_core *core_data = platform_get_drvdata(pdev);
 	msm_drm_unregister_client(&core_data->msm_drm_notifier);
+
+	pm_qos_remove_request(&core_data->pm_qos_req);
+
 	power_supply_unreg_notifier(&core_data->power_supply_notifier);
 	goodix_ts_power_off(core_data);
 	goodix_debugfs_exit();
