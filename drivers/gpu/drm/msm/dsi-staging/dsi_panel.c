@@ -74,6 +74,8 @@ static struct proc_dir_entry *mipi_proc_entry;
 #define MIPI_PROC_NAME "mipi_reg"
 #endif
 
+extern char g_lcd_id[128];
+
 enum dsi_dsc_ratio_type {
 	DSC_8BPC_8BPP,
 	DSC_10BPC_8BPP,
@@ -3907,6 +3909,7 @@ struct dsi_panel *dsi_panel_get(struct device *parent,
 	if (panel_physical_type && !strcmp(panel_physical_type, "oled"))
 		panel->panel_type = DSI_DISPLAY_PANEL_TYPE_OLED;
 
+	strcpy(g_lcd_id,panel->name);
 	rc = dsi_panel_parse_host_config(panel);
 	if (rc) {
 		pr_err("failed to parse host configuration, rc=%d\n", rc);
