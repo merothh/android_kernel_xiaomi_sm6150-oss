@@ -74,6 +74,7 @@ static struct proc_dir_entry *mipi_proc_entry;
 #define MIPI_PROC_NAME "mipi_reg"
 #endif
 
+extern bool enable_gesture_mode;
 extern char g_lcd_id[128];
 
 enum dsi_dsc_ratio_type {
@@ -529,7 +530,7 @@ static int dsi_panel_power_off(struct dsi_panel *panel)
 			if (gpio_is_valid(panel->reset_config.reset_gpio))
 				gpio_set_value(panel->reset_config.reset_gpio, 0);
 		}
-	} else {
+	} else if (!enable_gesture_mode) {
 		if (gpio_is_valid(panel->reset_config.reset_gpio))
 			gpio_set_value(panel->reset_config.reset_gpio, 0);
 	}
