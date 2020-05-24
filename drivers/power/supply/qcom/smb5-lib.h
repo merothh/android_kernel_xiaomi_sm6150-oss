@@ -32,7 +32,6 @@ enum print_reason {
 	PR_PARALLEL	= BIT(3),
 	PR_OTG		= BIT(4),
 	PR_WLS		= BIT(5),
-	PR_OEM		= BIT(6),
 };
 
 #define DEFAULT_VOTER			"DEFAULT_VOTER"
@@ -87,7 +86,6 @@ enum print_reason {
 #define MAIN_FCC_VOTER			"MAIN_FCC_VOTER"
 #define DCIN_AICL_VOTER			"DCIN_AICL_VOTER"
 #define OVERHEAT_LIMIT_VOTER		"OVERHEAT_LIMIT_VOTER"
-#define CLASSA_QC_FCC_VOTER		"CLASSA_QC_FCC_VOTER"
 
 #define BOOST_BACK_STORM_COUNT	3
 #define WEAK_CHG_STORM_COUNT	8
@@ -111,42 +109,6 @@ enum print_reason {
 #define DCIN_ICL_STEP_UA		100000
 
 #define ROLE_REVERSAL_DELAY_MS		2000
-
-/* thermal micros */
-#define MAX_TEMP_LEVEL		16
-/* percent of ICL compared to base 5V for different PD voltage_min voltage */
-#define PD_6P5V_PERCENT		85
-#define PD_7P5V_PERCENT		75
-#define PD_8P5V_PERCENT		65
-#define PD_9V_PERCENT		60
-#define PD_MICRO_5V		5000000
-#define PD_MICRO_5P9V	5900000
-#define PD_MICRO_6P5V	6500000
-#define PD_MICRO_7P5V	7500000
-#define PD_MICRO_8P5V	8500000
-#define PD_MICRO_9V		9000000
-#define ICL_LIMIT_LEVEL_THR		4
-
-/* defined for charger type recheck */
-#define CHARGER_RECHECK_DELAY_MS	30000
-#define TYPE_RECHECK_TIME_5S	5000
-#define TYPE_RECHECK_COUNT	3
-
-/* defined for distinguish qc class_a and class_b */
-#define VOL_THR_FOR_QC_CLASS_AB		12300000
-#define COMP_FOR_LOW_RESISTANCE_CABLE	100000
-#define QC_CLASS_A_CURRENT_UA		3600000
-#define HVDCP_CLASS_A_MAX_UA		2500000
-#define HVDCP_CLASS_A_FOR_CP_UA		2000000
-#define HVDCP_CLASS_B_CURRENT_UA		3100000
-
-#define MAX_PULSE			38
-
-enum hvdcp3_type {
-	HVDCP3_NONE = 0,
-	HVDCP3_CLASSA_18W,
-	HVDCP3_CLASSB_27W,
-};
 
 enum smb_mode {
 	PARALLEL_MASTER = 0,
@@ -504,8 +466,6 @@ struct smb_charger {
 	struct delayed_work	role_reversal_check;
 	struct delayed_work	pr_swap_detach_work;
 	struct delayed_work	pr_lock_clear_work;
-	struct delayed_work	charger_type_recheck;
-	struct delayed_work	raise_qc3_vbus_work;
 
 	struct alarm		lpd_recheck_timer;
 	struct alarm		moisture_protection_alarm;
@@ -539,19 +499,7 @@ struct smb_charger {
 	int			boost_threshold_ua;
 	int			system_temp_level;
 	int			thermal_levels;
-#ifdef CONFIG_XIAOMI_CHARGE_THERMAL
-	int 		*thermal_mitigation_dcp;
-	int 		*thermal_mitigation_qc2;
-	int 		*thermal_mitigation_pd_base;
-	int 		*thermal_mitigation_icl;
-	int 		*thermal_fcc_qc3_normal;
-	int 		*thermal_fcc_qc3_cp;
-	int 		*thermal_fcc_qc3_classb_cp;
-	int 		*thermal_fcc_qc3p5_cp;
-	int 		*thermal_fcc_pps_cp;
-#else
 	int			*thermal_mitigation;
-#endif
 	int			dcp_icl_ua;
 	int			fake_capacity;
 	int			fake_batt_status;
@@ -645,16 +593,6 @@ struct smb_charger {
 	int			die_health;
 	int			connector_health;
 
-	/* raise qc3 vbus flag */
-	bool			qc_class_ab;
-	bool			is_qc_class_a;
-	bool			is_qc_class_b;
-	bool			raise_vbus_to_detect;
-	bool			detect_low_power_qc3_charger;
-	bool			high_vbus_detected;
-	/* for 27W charge*/
-	bool			temp_27W_enable;
-
 	/* flash */
 	u32			flash_derating_soc;
 	u32			flash_disable_soc;
@@ -667,10 +605,6 @@ struct smb_charger {
 	int			dcin_uv_count;
 	ktime_t			dcin_uv_last_time;
 	int			last_wls_vout;
-
-	/* charger type recheck */
-	int			recheck_charger;
-	int			precheck_charger_type;
 };
 
 int smblib_read(struct smb_charger *chg, u16 addr, u8 *val);
@@ -878,11 +812,6 @@ int smblib_force_vbus_voltage(struct smb_charger *chg, u8 val);
 int smblib_get_irq_status(struct smb_charger *chg,
 				union power_supply_propval *val);
 int smblib_get_qc3_main_icl_offset(struct smb_charger *chg, int *offset_ua);
-
-int smblib_set_prop_type_recheck(struct smb_charger *chg,
-				 const union power_supply_propval *val);
-int smblib_get_prop_type_recheck(struct smb_charger *chg,
-				 union power_supply_propval *val);
 
 int smblib_init(struct smb_charger *chg);
 int smblib_deinit(struct smb_charger *chg);
