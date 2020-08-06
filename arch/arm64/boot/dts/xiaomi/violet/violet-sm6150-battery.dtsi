@@ -88,23 +88,3 @@
     qcom,step-charging-enable;
     qcom,lpd-disable;
 };
-
-&qupv3_se5_i2c {
-    status = "disabled";
-};
-
-&smb1355 {
-    status = "disabled";
-};
-
-&smb1355_charger {
-    status = "disabled";
-};
-
-&smb1390 {
-    status = "disabled";
-};
-
-&smb1390_charger {
-    status = "disabled";
-};
