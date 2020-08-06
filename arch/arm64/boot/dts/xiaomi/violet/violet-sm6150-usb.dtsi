@@ -5,7 +5,7 @@
  * And public attribution of Xiaomi platforms (like F7B and so)
  */
 
-&usb0{
+&usb0 {
     dwc3@a600000 {
         usb-phy = <&qusb_phy0>, <&usb_nop_phy>;
         snps,dis_u2_susphy_quirk;
@@ -14,7 +14,7 @@
     };
 };
 
-&usb1{
+&usb1 {
     dwc3@a800000 {
         snps,dis_u2_susphy_quirk;
         snps,dis_enblslpm_quirk;
