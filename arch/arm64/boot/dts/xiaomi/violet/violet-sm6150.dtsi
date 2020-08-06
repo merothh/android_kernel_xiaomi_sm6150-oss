@@ -23,6 +23,7 @@
 / {
     aliases {
         spi0 = "/soc/spi@a88000";
+        /delete-property/ swr0;
     };
 };
 

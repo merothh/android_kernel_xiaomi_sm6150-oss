@@ -9,10 +9,7 @@
     qcom,num-macros = <3>;
 };
 
-&wsa_macro {
-    compatible = "qcom,wsa-macro";
-    status = "disabled";
-};
+/delete-node/ &wsa_macro;
 
 &wcd937x_codec{
     qcom,cdc-micbias1-mv = <2600>;
@@ -73,17 +70,9 @@
     };
 };
 
-&wsa_swr_gpios {
-    status = "disabled";
-};
-
-&wsa_spkr_en1 {
-    status = "disabled";
-};
-
-&wsa_spkr_en2 {
-    status = "disabled";
-};
+/delete-node/ &wsa_swr_gpios;
+/delete-node/ &wsa_spkr_en1;
+/delete-node/ &wsa_spkr_en2;
 
 &soc {
     cdc_pri_mi2s_gpios: msm_cdc_pinctrl_pri {
