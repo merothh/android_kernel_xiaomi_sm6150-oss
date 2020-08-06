@@ -11,19 +11,15 @@
  */
 
 /dts-v1/;
-/plugin/;
 
-#include <dt-bindings/interrupt-controller/arm-gic.h>
-#include <dt-bindings/clock/qcom,camcc-sm6150.h>
-
+#include "qcom-base/sm6150.dtsi"
 #include "qcom-base/sm6150-idp.dtsi"
 #include "qcom-base/sm6150-audio-overlay.dtsi"
 
 #include "violet/violet-sm6150.dtsi"
 
 / {
-	model = "IDP";
+	model = "Qualcomm Technologies, Inc. SM6150 PM6150 IDP";
 	compatible = "qcom,sm6150-idp", "qcom,sm6150", "qcom,idp";
-	qcom,msm-id = <355 0x0>;
 	qcom,board-id = <34 0>;
 };

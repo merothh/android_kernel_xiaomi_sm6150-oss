@@ -5,8 +5,6 @@
  * And public attribution of Xiaomi platforms (like F7B and so)
  */
 
-#include "../qcom-base/sm6150-audio-overlay.dtsi"
-
 &bolero {
     qcom,num-macros = <3>;
 };
